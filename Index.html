@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>porque Amore</title>
+  <style>
+        body,
+html {
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	height: 100%;
+	position: relative;
+	user-select: none;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	overflow: hidden;
+}
+
+#typing {
+	position: relative;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	overflow: hidden;
+	width: 100%;
+	height: 100vh;
+}
+
+#typing::before {
+	content: "";
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background-image: url("CuteSandy&GorgeousAshweta.jpg");
+	background-size: cover;
+	background-position: center;
+	filter: blur(1px);
+	z-index: -1;
+	transition: transform 0.3s ease;
+}
+
+#content {
+	font-size: 32px;
+	letter-spacing: 10px;
+	color: #fff;
+	text-shadow: 0 0 10px #5a5a5a, 0 0 10px #333;
+	font-family: "JetBrains Mono", monospace, "Microsoft Yahei",
+		"Droid Sans Fallback";
+	transition: transform 0.3s ease-in-out, font-size 0.3s ease-in-out;
+	font-weight: bold;
+}
+
+#content:hover {
+	font-size: 36px;
+	transform: scale(1.1);
+}
+
+.audioBox {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-direction: column;
+	width: 100%;
+	transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out;
+	transform: translate(0, -50%);
+}
+
+#snow-container {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	pointer-events: none;
+	z-index: 1;
+}
+
+.snowflake {
+	position: absolute;
+	background-color: #fff;
+	border-radius: 50%;
+	opacity: 0.8;
+	pointer-events: none;
+}
+
+#audioPlayerContainer {
+	position: relative;
+	bottom: 100px;
+	opacity: 1;
+	z-index: 1000;
+}
+
+#audioPlayerControl {
+	position: relative;
+	background-color: #fff;
+	border-radius: 30px;
+	width: 300px;
+	height: 50px;
+	box-shadow: 0 0 20px rgba(107, 107, 107, 0.5);
+	z-index: 1000;
+}
+
+#progressBarContainer {
+	position: absolute;
+	top: 45%;
+	left: 15%;
+	width: 70%;
+	height: 5px;
+	background: linear-gradient(
+		to right,
+		#fd2d5c var(--progress, 0%),
+		#ddd var(--progress, 0%)
+	);
+	border-radius: 5px;
+	cursor: pointer;
+}
+
+#progressBarContainer::before {
+	content: "";
+	position: absolute;
+	top: 50%;
+	left: 0;
+	width: 100%;
+	height: 20px;
+	transform: translateY(-50%);
+	background-color: transparent;
+}
+
+#progressBar {
+	position: relative;
+	width: 0;
+	height: 100%;
+	border-radius: 5px;
+}
+
+#progressBar::after {
+	content: "";
+	position: absolute;
+	right: -7.5px;
+	top: 50%;
+	transform: translateY(-50%);
+	width: 15px;
+	height: 15px;
+	background-color: #fd2d5c;
+	box-shadow: 0 1px 10px rgba(107, 107, 107, 0.5);
+	border-radius: 50%;
+	opacity: 0;
+	transition: opacity 0.3s ease;
+}
+
+#progressBarContainer:hover #progressBar::after {
+	opacity: 1;
+}
+
+#volumeControlContainer {
+	position: absolute;
+	transition: transform 0.5s ease-in-out;
+	z-index: 0;
+}
+
+#volumeControl {
+	width: 50px;
+}
+
+#volumeIcon {
+	position: relative;
+	left: 216px;
+}
+
+/* 隐藏range控件默认样式 */
+[type="range"] {
+	-webkit-appearance: none;
+	appearance: none;
+	margin: 0;
+	outline: 0;
+	background-color: transparent;
+	width: 500px;
+}
+
+/* 定义range控件轨道的样式 */
+[type="range"]::-webkit-slider-runnable-track {
+	height: 5px;
+	border-radius: 5px;
+	background: #ffffff;
+}
+
+/* 定义range控件拇指的样式 */
+[type="range"]::-webkit-slider-thumb {
+	-webkit-appearance: none;
+	appearance: none;
+	width: 15px;
+	height: 15px;
+	border-radius: 50%;
+	background-color: #fd2d5c;
+	margin-top: -5px;
+}
+   
+  </style>
+</head>
+
+<body>
+    <div id="snow-container"></div>
+	<div id="typing">
+		<div id="content">A Secret Santa Gift Made With Love By Captain Hook</div>
+	</div>
+
+	<div class="audioBox">
+		<div id="audioPlayerContainer">
+			<div id="audioPlayerControl">
+				<svg id="playPauseIcon" width="40" height="48" viewBox="-6 -2 32 32">
+					<path id="playIcon" d="M10 7.5v15L22.5 15z" fill="#fd2d5c" />
+					<path id="pauseIcon" d="M9 22.5h4.5v-15H9v15zm7.5-15v15H21v-15h-4.5z" fill="#fd2d5c" style="display: none;" />
+				</svg>
+				<div id="progressBarContainer">
+					<div id="progressBar"></div>
+				</div>
+				<svg id="volumeIcon" width="40" height="48" viewBox="0 0 24 24">
+					<path d="M13 5v14l-5-4H3V9h5z" fill="#fd2d5c" />
+					<path stroke-linecap="round" d="M13 14c1.5-1 1.5-3 0-4" fill="#fd2d5c" />
+				</svg>
+
+			</div>
+			<div id="volumeControlContainer" style="transform: translate(230px, -40px)">
+				<input type="range" id="volumeControl" min="0" max="1" step="0.01" value="1">
+			</div>
+
+			<audio id="audioPlayer">
+				<source src="Sandy ne chori kiya ashweta ka jiya(ok metaphorically , haha).mp3" type="audio/mp3">
+			</audio>
+		</div>
+	</div>
+    <script>
+        const audioPlayer = document.getElementById("audioPlayer");
+const audioPlayerControl = document.getElementById("audioPlayerControl");
+const playPauseIcon = document.getElementById("playPauseIcon");
+const playIcon = document.getElementById("playIcon");
+const pauseIcon = document.getElementById("pauseIcon");
+const progressBarContainer = document.getElementById("progressBarContainer");
+const progressBar = document.getElementById("progressBar");
+const volumeIcon = document.getElementById("volumeIcon");
+const volumeControlContainer = document.getElementById(
+	"volumeControlContainer"
+);
+const volumeControl = document.getElementById("volumeControl");
+const contentElement = document.getElementById("content");
+const snowContainer = document.getElementById("snow-container");
+const lyrics = [
+    {
+        text: "To my Love, Sandeep,",
+        time: 0
+    },
+    {
+        text: "I know I’m not perfect. I stumble, I fall, I make mistakes.",
+        time: 20
+    },
+    {
+        text: "I’m not the easiest person to love; I’m a chronic overthinker, and sometimes I react far more than I should.",
+        time: 30
+    },
+    {
+        text: "These flaws are pieces of me, pieces I wish to mend for you, for us.",
+        time: 40
+    },
+    {
+        text: "But amidst all this imperfection, I can promise you one thing — my heart beats faithfully for you, and only you.",
+        time: 50
+    },
+    {
+        text: "I am loyal in ways words can barely capture. I will do everything I can, move mountains if I must, to keep you by my side.",
+        time: 60
+    },
+    {
+        text: "I don’t ask for much, only that you love me with the same fire that burns in my soul for you.",
+        time: 70
+    },
+    {
+        text: "Let your love be pure, honest, and loyal — a reflection of the devotion I offer you.",
+        time: 80
+    },
+    {
+        text: "Together, I know we are unshakable, unbreakable. We can weather any storm, rise above the worst of the worst, hand in hand, heart to heart.",
+        time: 90
+    },
+    {
+        text: "Please, stay forever with me. I cannot imagine a life without you.",
+        time: 100
+    },
+    {
+        text: "Your love is my strength, my sanctuary.",
+        time: 110
+    },
+    {
+        text: "And as these words flow to you, a blessing is offered through the Developer of Codes, Sunya, who shapes this moment for us - Om mrityuna pashahasante, kaleen bhairiya swaha, trayodasham, Deepdanatsuraj Preetamyiti. May this mantra bless our love with eternal light and divine strength.",
+        time: 120
+    },
+    {
+        text: "But the silence wraps my heart in layers of the past.",
+        time: 130
+    },
+    {
+        text: "In the quiet night, I hear your whispers in my soul;",
+        time: 140
+    },
+    {
+        text: "And feel your touch in every passing breeze.",
+        time: 150
+    },
+    {
+        text: "Love, you are the dream I chase in the fading light,",
+        time: 160
+    },
+    {
+        text: "The star that guides me through every storm.",
+        time: 170
+    },
+    {
+        text: "Your heart, a light so pure, my soul does yearn for;",
+        time: 180
+    },
+    {
+        text: "As the flowers need the sun to bloom, I need you to shine.",
+        time: 190
+    },
+    {
+        text: "Together, we will weave our love into eternity,",
+        time: 200
+    },
+    {
+        text: "A thread that never fades, even as time passes by.",
+        time: 210
+    },
+    {
+        text: "In the dance of life, you and I will move as one,",
+        time: 220
+    },
+    {
+        text: "Our steps entwined in the rhythm of love’s song.",
+        time: 230
+    },
+    {
+        text: "My love, you are my  my present, and my future;",
+        time: 240
+    },
+    {
+        text: "The pulse that keeps my heart alive, now and always.",
+        time: 250
+    },
+    {
+        text: "When the night falls, and the stars emerge,",
+        time: 260
+    },
+    
+];
+
+let isDragging = false;
+let clickTime, inputTime;
+let currentLyricIndex = 0;
+let index = 0;
+let snowAnimation;
+
+playPauseIcon.addEventListener("click", togglePlay);
+audioPlayer.addEventListener("timeupdate", updateProgressBar);
+audioPlayer.addEventListener("ended", resetPlayer);
+progressBarContainer.addEventListener("click", seek);
+progressBarContainer.addEventListener("mousedown", startDrag);
+document.addEventListener("mousemove", drag);
+document.addEventListener("mouseup", endDrag);
+volumeIcon.addEventListener("click", toggleVolumeControl);
+volumeControl.addEventListener("input", updateVolume);
+document.addEventListener("click", hideVolumeControl);
+
+function togglePlay() {
+	audioPlayer.paused ? audioPlayer.play() : audioPlayer.pause();
+	playIcon.style.display = audioPlayer.paused ? "block" : "none";
+	pauseIcon.style.display = audioPlayer.paused ? "none" : "block";
+}
+
+function updateProgressBar() {
+	if (!isDragging) {
+		const progress = (audioPlayer.currentTime / audioPlayer.duration) * 100;
+		progressBar.style.width = `${progress}%`;
+		progressBarContainer.style.setProperty("--progress", `${progress}%`);
+	}
+}
+
+function seek(event) {
+	audioPlayer.currentTime =
+		(event.offsetX / progressBarContainer.offsetWidth) * audioPlayer.duration;
+}
+
+function resetPlayer() {
+	playIcon.style.display = "block";
+	pauseIcon.style.display = "none";
+	progressBar.style.width = "0%";
+	progressBarContainer.style.setProperty("--progress", "0%");
+	audioPlayer.currentTime = 0;
+}
+
+function startDrag(event) {
+	isDragging = true;
+	drag(event);
+}
+
+function drag(event) {
+	if (isDragging) {
+		const percent = Math.min(
+			Math.max(
+				(event.clientX - progressBarContainer.getBoundingClientRect().left) /
+					progressBarContainer.offsetWidth,
+				0
+			),
+			1
+		);
+		progressBar.style.width = `${percent * 100}%`;
+		progressBarContainer.style.setProperty("--progress", `${percent * 100}%`);
+	}
+}
+
+function endDrag(event) {
+	if (isDragging) {
+		isDragging = false;
+		const percent = Math.min(
+			Math.max(
+				(event.clientX - progressBarContainer.getBoundingClientRect().left) /
+					progressBarContainer.offsetWidth,
+				0
+			),
+			1
+		);
+		audioPlayer.currentTime = percent * audioPlayer.duration;
+	}
+}
+
+function toggleVolumeControl() {
+	volumeControlContainer.style.transform =
+		volumeControlContainer.style.transform === "translate(230px, -40px)"
+			? "translate(310px, -40px)"
+			: "translate(230px, -40px)";
+
+	clearTimeout(clickTime);
+	clickTime = setTimeout(() => {
+		if (audioPlayer.volume == volumeControl.value) {
+			volumeControlContainer.style.transform = "translate(230px, -40px)";
+		}
+	}, 5000);
+}
+
+function updateVolume() {
+	audioPlayer.volume = volumeControl.value;
+	clearTimeout(inputTime);
+	inputTime = setTimeout(() => {
+		volumeControlContainer.style.transform = "translate(230px, -40px)";
+	}, 2000);
+}
+
+function hideVolumeControl(event) {
+	if (
+		!volumeControlContainer.contains(event.target) &&
+		!volumeIcon.contains(event.target)
+	) {
+		volumeControlContainer.style.transform = "translate(230px, -40px)";
+	}
+}
+
+function updateLyrics() {
+	const currentTime = audioPlayer.currentTime;
+	if (
+		currentLyricIndex < lyrics.length &&
+		currentTime >= lyrics[currentLyricIndex].time
+	) {
+		const text = lyrics[currentLyricIndex].text;
+		contentElement.textContent = "";
+		index = 0;
+		if (
+			currentLyricIndex + 1 < lyrics.length &&
+			lyrics[currentLyricIndex + 1].time - currentTime < 0.01
+		) {
+			contentElement.textContent = text;
+		} else {
+			addNextCharacter(text);
+		}
+		currentLyricIndex++;
+	}
+	requestAnimationFrame(updateLyrics);
+}
+
+function addNextCharacter(text) {
+	if (index < text.length) {
+		contentElement.textContent += text[index++];
+		const nextDelay =
+			currentLyricIndex === lyrics.length - 1
+				? 130
+				: ((lyrics[currentLyricIndex + 1].time - audioPlayer.currentTime) /
+						text.length) *
+				  100;
+		setTimeout(() => addNextCharacter(text), nextDelay);
+	}
+}
+
+function createSnowflakes() {
+	for (let i = 0; i < 100; i++) {
+		const snowflake = document.createElement("div");
+		snowflake.className = "snowflake";
+		snowflake.style.width = `${Math.random() * 5 + 2}px`;
+		snowflake.style.height = snowflake.style.width;
+		snowflake.style.left = `${Math.random() * 100}vw`;
+		snowflake.style.animationDuration = `${Math.random() * 3 + 2}s`;
+		snowflake.style.animationDelay = `${Math.random() * 2}s`;
+		snowContainer.appendChild(snowflake);
+	}
+}
+
+function animateSnowflakes() {
+	document.querySelectorAll(".snowflake").forEach((snowflake) => {
+		const startPosition = parseFloat(snowflake.style.left);
+		const endPosition = startPosition + (Math.random() * 10 - 5);
+		snowflake.animate(
+			[
+				{ transform: `translate(0, -10px)`, opacity: 0 },
+				{ opacity: 0.8, offset: 0.1 },
+				{
+					transform: `translate(${endPosition - startPosition}vw, 100vh)`,
+					opacity: 0
+				}
+			],
+			{
+				duration: parseFloat(snowflake.style.animationDuration) * 1000,
+				iterations: Infinity
+			}
+		);
+	});
+}
+
+audioPlayer.addEventListener("play", () => {
+	createSnowflakes();
+	snowAnimation = requestAnimationFrame(animateSnowflakes);
+	currentLyricIndex = 0;
+	updateLyrics();
+});
+
+audioPlayer.addEventListener("pause", () => {
+	if (snowAnimation) cancelAnimationFrame(snowAnimation);
+	document
+		.querySelectorAll(".snowflake")
+		.forEach((snowflake) =>
+			snowflake.getAnimations().forEach((animation) => animation.pause())
+		);
+});
+
+audioPlayer.addEventListener("ended", () =>
+	cancelAnimationFrame(snowAnimation)
+);
+audioPlayer.addEventListener("seeked", () => {
+	currentLyricIndex =
+		lyrics.findIndex((lyric) => lyric.time > audioPlayer.currentTime) - 1;
+	currentLyricIndex = Math.max(currentLyricIndex, 0);
+	contentElement.textContent = "";
+	index = 0;
+	updateLyrics();
+});
+
+let mouseMoveTimeout;
+document.addEventListener("mousemove", () => {
+	clearTimeout(mouseMoveTimeout);
+	const audioBox = document.querySelector(".audioBox");
+	audioBox.style.transform = "translate(0, -50%)";
+	audioBox.style.opacity = 1;
+	document.body.style.cursor = "auto";
+	mouseMoveTimeout = setTimeout(() => {
+		audioBox.style.transform = "translate(0, 50%)";
+		audioBox.style.opacity = 0;
+		document.body.style.cursor = "none";
+	}, 5000);
+});
+
+    </script>
+</body>
+
+</html>
